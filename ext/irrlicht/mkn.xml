@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<maiken>
+	<project>
+		<name>Irrlicht</name>
+		<version>trunk</version>
+	</project>
+
+	<includes>
+		<include>./trunk/include</include>
+	</includes>
+	<library-paths>
+		<library-path>./trunk/lib/Linux</library-path>
+	</library-paths>
+	<!-- used when no profile is specified. supplied default values to profiles if required -->		
+	<build type="lib" mode="static" lang="cpp">
+		<env>
+			<vars> <!-- modes = append/prepend/replace name IS CASE SENSITIVE!--> </vars>
+		</env>
+	</build>
+</maiken>
+
