@@ -11,11 +11,25 @@
 	<library-paths>
 		<library-path>./trunk/lib/Linux</library-path>
 	</library-paths>
+	<libraries>
+		<library>GL</library>
+		<library>GLU</library>
+		<library>dl</library>
+		<library>X11</library>
+		<library>X11-xcb</library>
+		<library>xcb-glx</library>
+		<library>xcb</library>
+		<library>Xxf86vm</library>
+		<library>Xext</library>
+		<library>Xdmcp</library>
+		<library>Xau</library>
+		<library>Xdamage</library>
+		<library>Xcursor</library>
+		<library>Xfixes</library>
+		<library>drm</library>
+		<library>rt</library>			
+	</libraries>
 	<!-- used when no profile is specified. supplied default values to profiles if required -->		
-	<build type="lib" mode="static" lang="cpp">
-		<env>
-			<vars> <!-- modes = append/prepend/replace name IS CASE SENSITIVE!--> </vars>
-		</env>
-	</build>
+	<build type="lib" mode="static" lang="cpp"></build>
 </maiken>
 
