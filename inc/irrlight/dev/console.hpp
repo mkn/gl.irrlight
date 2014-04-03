@@ -71,15 +71,6 @@ class Console{
 		ConsoleCmdHistory& history() { return commandHistory; }
 };
 
-class AConsoleKeyHandler{
-	protected:
-		irr::IrrlichtDevice& 	device;
-	public:
-		AConsoleKeyHandler(irr::IrrlichtDevice& device) : device(device) {}
-		virtual ~AConsoleKeyHandler(){}
-		virtual bool handle() = 0;
-};
-
 class ConsoleStringHandler{
 	public:
 		static std::wstring getWStringFromWChar_TP(const wchar_t* cText, char upperLower = ' ', bool trim = false, bool replaceDoubleSpace = false){
@@ -102,30 +93,14 @@ class ConsoleStringHandler{
 		}
 };
 
-class ConsoleEnterKeyHandler : public AConsoleKeyHandler{
-	private:
-		Console& console;
+class ConsoleEnterKeyHandler{
 	public:
-		ConsoleEnterKeyHandler(Console& console, irr::IrrlichtDevice* device) : AConsoleKeyHandler(*device), console(console) {}
-		~ConsoleEnterKeyHandler(){}
-		bool handle(){
-			std::wstring textString(ConsoleStringHandler::getWStringFromWChar_TP(console.getText(&device), 'L', true, true));
-			if(textString.size() == 0) return false;
-
-			console.setText(&device, L"");
-			std::vector<std::wstring> bits = kul::WString::split(textString, ' ');
-			//boost::split(bits, textString, boost::is_any_of(" ") );
-			const std::string call = kul::WString::toString(bits[0]);
-
-			if(console.commands().count(call)){
-				AConsoleCmd& cmd = console.commands()[call];				
-				if(bits.size() > 1){
-					bits.erase(bits.begin(), bits.begin() + 1);
-					cmd.perform(bits);
-				}else cmd.perform();
-			}
+		static std::string handle(Console& console, irr::IrrlichtDevice* device){
+			std::wstring textString(ConsoleStringHandler::getWStringFromWChar_TP(console.getText(device), 'L', true, true));
+			if(textString.size() == 0) return "";
+			console.setText(device, L"");
 			console.history().addNew(textString);
-			return true;
+			return kul::WString::toString(textString);
 		}
 };
 
@@ -133,16 +108,12 @@ class ConsoleKeyEntryHandler{
 	public:
 		static bool keyUp(irr::IrrlichtDevice *device, Console& console, irr::EKEY_CODE keyCode){
 			bool k = false;
-			if(keyCode == irr::KEY_RETURN)
-				k = ConsoleEnterKeyHandler(console, device).handle();
-			else 
-			if(keyCode == irr::KEY_UP)		{
+			//if(keyCode == irr::KEY_RETURN) k = ConsoleEnterKeyHandler(console, device).handle();
+			if(keyCode == irr::KEY_UP){
 				const wchar_t* txt = console.history().getPrevious();
 				if(txt) console.setText(device, txt);				
 				k = true;
-			}
-			else
-			if(keyCode == irr::KEY_DOWN)	{
+			}else if(keyCode == irr::KEY_DOWN){
 				const wchar_t* txt = console.history().getNext();
 				if(!txt) txt = L"";
 				console.setText(device, txt);
@@ -154,8 +125,6 @@ class ConsoleKeyEntryHandler{
 			return false;
 		}
 };
-
-
 
 
 };};
