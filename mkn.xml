@@ -31,7 +31,7 @@ along with this library.  If not, see <http://www.gnu.org/licenses/>.
 	<dependencies>
 		<dependency>
 			<name>kul.nix</name>
-			<profile>linrllvmpt</profile>
+			<profile>nixr</profile>
 			<version>master</version>
 			<remote scm="git">http://www.github.com/Dekken/kul.nix.git</remote>
 		</dependency>
@@ -59,13 +59,8 @@ along with this library.  If not, see <http://www.gnu.org/licenses/>.
 		</env>	
 		<files>
 			<file type="cpp">
-				<archiver>ar -r</archiver>
-				<assembler>as</assembler>
-				<compiler>ccache clang++ -m64</compiler>
-				<linker>ccache clang++ -m64</linker>
 				<args>
-					<arg>-std=c++11</arg><arg>-D__GXX_EXPERIMENTAL_CXX0X__</arg>
-					<arg>-stdlib=libstdc++</arg>
+					<arg>-std=c++11</arg>
 					<arg>-Wall</arg><arg>-fmessage-length=0</arg>
 					<arg>-O0</arg><arg>-g3</arg>
 				</args>
