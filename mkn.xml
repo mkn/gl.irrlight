@@ -45,12 +45,6 @@ along with this library.  If not, see <http://www.gnu.org/licenses/>.
 	<includes>
 		<include>./inc</include>
 	</includes>
-
-	<library-paths>
-		<library-path>/home/philix/sand/lib/cpp/m/mesa/8.0.5/linux/13.12.2012</library-path>
-		<library-path>/home/philix/sand/lib/cpp/x/xcursor/1.1.13/linux/13.12.2012</library-path>		
-	</library-paths>
-	<!-- used when no profile is specified. supplied default values to profiles if required -->		
 	<build type="lib" mode="static" lang="cpp">
 		<env>
 			<vars>
