@@ -45,7 +45,6 @@ along with this library.  If not, see <http://www.gnu.org/licenses/>.
 	<includes>
 		<include>./inc</include>
 	</includes>
-	<!-- used when no profile is specified. supplied default values to profiles if required -->		
 	<build type="lib" mode="static" lang="cpp">
 		<env>
 			<vars>
