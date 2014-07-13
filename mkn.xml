@@ -46,11 +46,6 @@ along with this library.  If not, see <http://www.gnu.org/licenses/>.
 		<include>./inc</include>
 	</includes>
 	<build type="lib" mode="static" lang="cpp">
-		<env>
-			<vars>
-				<var name="PATH" mode="prepend">/home/philix/sand/repo/cpp/l/llvm/make-debug/Debug+Asserts/bin</var>
-			</vars>
-		</env>	
 		<files>
 			<file type="cpp">
 				<args>
