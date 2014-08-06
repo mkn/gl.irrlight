@@ -1,4 +1,4 @@
 irrlight
 ========
 
-Custom Irrlicht classes/functions - scene manager provided.
+Custom Irrlicht classes/functions

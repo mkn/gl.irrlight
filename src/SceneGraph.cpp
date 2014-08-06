@@ -21,7 +21,7 @@ Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with this library.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "irrlight/scene/graph.hpp"
+#include "irrlight.hpp"
 
 irrlight::SceneGraph* irrlight::SceneGraph::instance(0);
 
@@ -40,7 +40,7 @@ void irrlight::SceneGraph::draw(/*IDrawableContext idc*/) const{
     }
 }
 
-void irrlight::SceneGraph::setDevice(IrrlichtDevice* device){
+void irrlight::SceneGraph::setDevice(irr::IrrlichtDevice* device){
 	this->device.reset(device);
 }
 
@@ -52,10 +52,10 @@ void irrlight::SceneGraph::setScene(AScene * aScene){
     aScene->setUp(this->getDevice());
 }
 
-bool irrlight::SceneGraph::OnEvent(const SEvent& event){
+bool irrlight::SceneGraph::OnEvent(const irr::SEvent& event){
     if(scene.get()){
-        if		(event.EventType == EET_KEY_INPUT_EVENT && event.KeyInput.PressedDown) 	scene->keyDown	(getDevice(), event.KeyInput.Key);
-        else if	(event.EventType == EET_KEY_INPUT_EVENT && !event.KeyInput.PressedDown) scene->keyUp	(getDevice(), event.KeyInput.Key);
+        if		(event.EventType == irr::EET_KEY_INPUT_EVENT && event.KeyInput.PressedDown)     scene->keyDown	(getDevice(), event.KeyInput.Key);
+        else if	(event.EventType == irr::EET_KEY_INPUT_EVENT && !event.KeyInput.PressedDown)    scene->keyUp	(getDevice(), event.KeyInput.Key);
         return scene->OnEvent(getDevice(), event);
     }
     return false;

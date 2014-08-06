@@ -1,8 +1,8 @@
 /**
 
-./inc/irrlight/scene.ui.hpp
+./inc/irrlight.hpp
 
-Created on: 16 May 2013
+Created on: 16 April 2014
 
 Copyright (c) 2013, Philip Deegan
 
@@ -21,16 +21,10 @@ Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with this library.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef _IRRLIGHT_SCENE_UI_HPP_
-#define _IRRLIGHT_SCENE_UI_HPP_
+#ifndef _IRRLIGHT_UI_HPP_
+#define _IRRLIGHT_UI_HPP_
 
-namespace irrlight{
 
-enum AGUISceneUI{
-	GUI_ID_DIALOG_ROOT_WINDOW  = 0x10000,
-	GUI_ID_POSITION_TEXT,
-	GUI_ID_BUTTON_SET_SCALE
-};
 
 };
-#endif /* _IRRLIGHT_SCENE_UI_HPP_ */
+#endif /* _IRRLIGHT_UI_HPP_ */
