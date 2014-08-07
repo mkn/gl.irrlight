@@ -1,6 +1,6 @@
 /**
 
-./src/dev/console/cmd/History.cpp
+./src/TerminalHistory.cpp
 
 Created on: 16 May 2013
 

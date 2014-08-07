@@ -233,5 +233,102 @@ class GUISceneThread  : public SceneThread{
 		}
 };
 
+
+class DisplayException : public kul::Exception{
+	public:
+		DisplayException(const char*f, const int l, std::string s) : kul::Exception(f, l, s){}
+};
+
+class ADisplayable{
+	private:
+		uint x1;
+		uint y1;
+		uint w;
+		uint h;
+	public:
+		ADisplayable(const uint& x, const uint& y, const uint& w, const uint& h) : x1(x) , y1(y), w(w), h(h){}
+		ADisplayable() : x1(0), y1(0), w(0), h(0){}
+		virtual ~ADisplayable(){}
+		virtual void display() throw(DisplayException) = 0;
+		uint& x(const uint& x) 		{ return this->x1 = x;}
+		uint& y(const uint& y) 		{ return this->y1 = y;}
+		uint& width(const uint& w)  { return this->w = w;}
+		uint& height(const uint& h) { return this->h = h;}
+		const uint& x()		const { return x1;}
+		const uint& y()		const { return y1;}
+		const uint& width()	const { return w;}
+		const uint& height()const { return h;}
+};
+
+class AContainer{
+	private:
+		std::vector<ADisplayable*> es;
+	public:
+		void add(ADisplayable* d) { es.push_back(d);}
+		const std::vector<ADisplayable*>& entities() { return es;}
+};
+
+class Application{
+};
+
+class Window : public ADisplayable, public AContainer{
+	private:
+		bool m;
+	public:
+		Window(const bool& m) : m(m){}
+		Window() : m(0){}
+		bool& modal(const bool& m){return this->m = m;}
+		const bool& modal() const {return m;}
+};
+
+class Tab : public ADisplayable{
+	public:
+		void display() throw(DisplayException){}
+};
+
+class Toolbar : public ADisplayable{
+	public:
+		void display() throw(DisplayException){}
+};
+class ToolbarItem : public ADisplayable{
+	public:
+		void display() throw(DisplayException){}
+};
+class Menu : public ADisplayable{
+	public:
+		void display() throw(DisplayException){}
+};
+class MenuItem : public ADisplayable{
+	public:
+		void display() throw(DisplayException){}
+};
+
+class Tree{};
+class FileTree : public Tree{};
+
+class Button : public ADisplayable{
+	public:
+		void display() throw(DisplayException){}
+};
+class TextButton : public Button{};
+class ImgButton : public Button{};
+class ToolBarButton : public ImgButton{}; 
+
+class EventException : public kul::Exception{
+	public:
+		EventException(const char*f, const int l, std::string s) : kul::Exception(f, l, s){}
+};
+
+class Event{
+	public:
+		virtual ~Event(){}
+		virtual void act() throw(EventException) = 0;
+};
+
+class ButtonClick : public Event{
+	public:
+		void act() throw(EventException);
+};
+
 };
 #endif /* _IRRLIGHT_HPP_ */

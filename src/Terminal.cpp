@@ -1,6 +1,6 @@
 /**
 
-./src/dev/Terminal.cpp
+./src/Terminal.cpp
 
 Created on: 16 May 2013
 
