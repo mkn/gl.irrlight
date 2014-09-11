@@ -40,38 +40,37 @@ enum TerminalUI{
 };
 
 class AScene{
+	private:
+		std::shared_ptr<irr::IrrlichtDevice> d;
+	protected:
+		irr::IrrlichtDevice* device(){ return d.get(); }
 	public:
+		AScene(irr::IrrlichtDevice* d) : d(d){}
 		virtual ~AScene(){};
-		virtual void setUp 		(irr::IrrlichtDevice *device){}
-		virtual void tearDown	(irr::IrrlichtDevice *device){}
-		virtual void draw		(irr::IrrlichtDevice *device){}
-		virtual bool OnEvent	(irr::IrrlichtDevice *device, const irr::SEvent& event)   { return false; }
-		virtual bool keyDown	(irr::IrrlichtDevice *device, irr::EKEY_CODE keyCode){ return false; }
-		virtual bool keyUp		(irr::IrrlichtDevice *device, irr::EKEY_CODE keyCode){ return false; }
-};
-
-class AGUIScene : public AScene {
-	public:
-		virtual ~AGUIScene(){};
-		virtual void setUpUI(irr::gui::IGUIEnvironment* env) = 0;
+		virtual void setUp 		(){}
+		virtual void tearDown	(){}
+		virtual void draw		(){}
+		virtual bool OnEvent	(const irr::SEvent& event)	{ return false; }
+		virtual bool keyDown	(irr::EKEY_CODE keyCode)	{ return false; }
+		virtual bool keyUp		(irr::EKEY_CODE keyCode)	{ return false; }
+		virtual void reset 		(irr::IrrlichtDevice* d)	{ this->d.reset(d); }
 };
 
 class SceneGraph : public irr::IEventReceiver{
 	private:
-		std::shared_ptr<AScene> scene;
-		std::shared_ptr<irr::IrrlichtDevice> device;
-		SceneGraph() : scene(0), device(irr::createDevice(irr::video::EDT_NULL, irr::core::dimension2d<irr::u32>(512, 384))){}
+		std::shared_ptr<AScene> s;
+		std::shared_ptr<irr::IrrlichtDevice> d;
+		SceneGraph() : s(0), d(irr::createDevice(irr::video::EDT_NULL, irr::core::dimension2d<irr::u32>(512, 384))){}
 		static SceneGraph *instance;
 	public:
 		~SceneGraph();
-
-		irr::IrrlichtDevice  * getDevice()   const { return this->device.get();}
-		AScene		  	* getScene()	const { return this->scene.get();}
-		void setDevice  (irr::IrrlichtDevice* device);
-		void setScene   (AScene  * aScene);
-		void draw	   (/*IDrawableContext idc*/)  const;
-		bool OnEvent	(const irr::SEvent& event);
-		static SceneGraph * getInstance();
+		irr::IrrlichtDevice* 	device 	()	const { return this->d.get();}
+		void 					device 	(irr::IrrlichtDevice* d);
+		AScene* 				scene 	()	const { return this->s.get();}
+		void 					scene 	(AScene* aScene);
+		void 					draw 	(/*IDrawableContext idc*/)  const;
+		bool 					OnEvent	(const irr::SEvent& event);
+		static SceneGraph* 		INSTANCE();
 };
 
 class ATerminalCmd{
@@ -79,43 +78,45 @@ class ATerminalCmd{
 		virtual ~ATerminalCmd(){}
 		virtual void 			perform() 	{};
 		virtual void 			perform(const std::vector<std::wstring>& args){};
-		virtual std::wstring 	getOutput() { return L"";};
+		virtual std::wstring 	output() { return L"";};
 };
 
 class TerminalHistory{
 	private:
 		static int MINUS_ONE;
-		int it;
+		unsigned int it;
 		std::vector<std::wstring> history;		
 	public:
 		TerminalHistory() : it(-1){}
 		~TerminalHistory(){}
-
-		const wchar_t*	getPrevious ()  ;
-		const wchar_t*	getNext 	()  ;
-		TerminalHistory* addNew(std::wstring currentCommand) ; // andDeleteOldestIfApplicable
+		const wchar_t*	previous();
+		const wchar_t*	next();
+		TerminalHistory* add(std::wstring currentCommand);
 		TerminalHistory* reset() { it = history.size(); return this;}
 };
 
 class Terminal{
 	private:
-		bool shown;
-		std::vector<std::string> output;
+		bool s;
+		std::vector<std::string> o;
 		TerminalHistory th;
 		kul::hash::map::S2T<ATerminalCmd> cmds;
+		std::shared_ptr<irr::IrrlichtDevice> d;
+		irr::gui::IGUIWindow* w;
 	protected:
-		void rollDown	(irr::IrrlichtDevice * device);
-		void rollUp		(irr::IrrlichtDevice * device);
+		void rollDown	();
+		void rollUp		();
 	public:
-		Terminal() : shown(false){}		
-		void draw(irr::IrrlichtDevice * device);
-		void show(irr::IrrlichtDevice * device) { shown = true; 	history().reset(); rollDown(device); }
-		void hide(irr::IrrlichtDevice * device) { shown = false;	rollUp(device);}
-		const wchar_t * getText(irr::IrrlichtDevice *device) const;
-		void setText(irr::IrrlichtDevice *device, const wchar_t* text);
-
-		bool isShown() const { return shown; }
-		const void addCommand(const std::string& s, const ATerminalCmd& cmd){ cmds.insert(s, cmd); } 
+		Terminal(irr::IrrlichtDevice* d) : s(false), d(d){}		
+		void 			draw();
+		void 			show()						{ s = true; 	history().reset(); rollDown(); }
+		void 			hide()						{ s = false;	rollUp();}
+		bool 			shown() const 				{ return s; }
+		const wchar_t*	text() const;
+		void 			text(const wchar_t* text);
+		const void 		add(const std::string& s, const ATerminalCmd& cmd){ 
+			cmds.insert(s, cmd); 
+		} 
 		kul::hash::map::S2T<ATerminalCmd>& commands() { return cmds;} 
 		TerminalHistory& history() { return th; }
 };
@@ -145,10 +146,10 @@ class TerminalStringHandler{
 class TerminalEnterKeyHandler{
 	public:
 		static std::string handle(Terminal& terminal, irr::IrrlichtDevice* device){
-			std::wstring textString(TerminalStringHandler::getWStringFromWChar_TP(terminal.getText(device), 'L', true, true));
+			std::wstring textString(TerminalStringHandler::getWStringFromWChar_TP(terminal.text(), 'L', true, true));
 			if(textString.size() == 0) return "";
-			terminal.setText(device, L"");
-			terminal.history().addNew(textString);
+			terminal.text(L"");
+			terminal.history().add(textString);
 			return kul::WString::toString(textString);
 		}
 };
@@ -159,13 +160,13 @@ class TerminalKeyEntryHandler{
 			bool k = false;
 			//if(keyCode == irr::KEY_RETURN) k = TerminalEnterKeyHandler(terminal, device).handle();
 			if(keyCode == irr::KEY_UP){
-				const wchar_t* txt = terminal.history().getPrevious();
-				if(txt) terminal.setText(device, txt);				
+				const wchar_t* txt = terminal.history().previous();
+				if(txt) terminal.text(txt);				
 				k = true;
 			}else if(keyCode == irr::KEY_DOWN){
-				const wchar_t* txt = terminal.history().getNext();
+				const wchar_t* txt = terminal.history().next();
 				if(!txt) txt = L"";
-				terminal.setText(device, txt);
+				terminal.text(txt);
 				k = true;
 			}
 			return k;
@@ -204,7 +205,7 @@ class SceneThread  {
 		kul::Thread thread;
 		void go(){
 			thread.sleep(1000);
-			this->aScene.setUp(this->getDevice());
+			this->aScene.setUp();
 		}
 
 		SceneThread();
@@ -220,58 +221,80 @@ class SceneThread  {
 		SceneThread& operator=(irr::IrrlichtDevice &);
 };
 
-class GUISceneThread  : public SceneThread{
+class DrawException : public kul::Exception{
 	public:
-		GUISceneThread(AGUIScene & aGUIScene): SceneThread (aGUIScene){}
-		~GUISceneThread(){}
-		void operator()(){ 
-			go(); 
-		}
-	protected:
-		void go(){
-			((AGUIScene*)this->getScene())->setUpUI(this->getDevice()->getGUIEnvironment());
-		}
+		DrawException(const char*f, const int l, std::string s) : kul::Exception(f, l, s){}
 };
 
-
-class DisplayException : public kul::Exception{
-	public:
-		DisplayException(const char*f, const int l, std::string s) : kul::Exception(f, l, s){}
-};
-
-class ADisplayable{
+class ADrawable{
 	private:
-		uint x1;
-		uint y1;
-		uint w;
-		uint h;
+		uint x1, y1, w, h;
 	public:
-		ADisplayable(const uint& x, const uint& y, const uint& w, const uint& h) : x1(x) , y1(y), w(w), h(h){}
-		ADisplayable() : x1(0), y1(0), w(0), h(0){}
-		virtual ~ADisplayable(){}
-		virtual void display() throw(DisplayException) = 0;
-		uint& x(const uint& x) 		{ return this->x1 = x;}
-		uint& y(const uint& y) 		{ return this->y1 = y;}
-		uint& width(const uint& w)  { return this->w = w;}
-		uint& height(const uint& h) { return this->h = h;}
-		const uint& x()		const { return x1;}
-		const uint& y()		const { return y1;}
-		const uint& width()	const { return w;}
-		const uint& height()const { return h;}
+		ADrawable(const uint& x, const uint& y, const uint& w, const uint& h) : x1(x) , y1(y), w(w), h(h){}
+		ADrawable() : x1(0), y1(0), w(0), h(0){}
+		virtual ~ADrawable(){}
+		virtual void draw(irr::IrrlichtDevice *device) throw(DrawException) = 0;
+		void x(const uint& x)		{ this->x1 = x;}
+		void y(const uint& y) 		{ this->y1 = y;}
+		void width(const uint& w)	{ this->w = w;}
+		void height(const uint& h)	{ this->h = h;}
+		const uint& x()		const 	{ return x1;}
+		const uint& y()		const 	{ return y1;}
+		const uint& width()	const 	{ return w;}
+		const uint& height()const 	{ return h;}
 };
 
 class AContainer{
 	private:
-		std::vector<ADisplayable*> es;
+		std::vector<ADrawable*> es;
 	public:
-		void add(ADisplayable* d) { es.push_back(d);}
-		const std::vector<ADisplayable*>& entities() { return es;}
+		void add(ADrawable* d) { es.push_back(d);}
+		const std::vector<ADrawable*>& entities() { return es;}
 };
 
-class Application{
+class Application : public ADrawable, public AContainer{
+	private:
+		bool c, m, r;
+		uint lFps = -1;
+		std::string reg;
+	public:	
+		Application() : c(0), m(0), r(0){}
+		const bool& condensed()					{ return c; }
+		void 		condensed(const bool& c) 	{ this->c = c; }
+		const bool& minimised()					{ return m; }
+		void 		minimised(const bool& m)	{ this->m = m; }
+		const bool& resizable()					{ return r; }
+		void 		resizable(const bool& r)	{ this->r = r; }
+		void draw(irr::IrrlichtDevice *device) throw(DrawException){
+			if (device->isWindowActive()){
+				irr::video::IVideoDriver * driver = device->getVideoDriver();
+				driver->beginScene(true, true, irr::video::SColor(0, 255, 255, 255));		
+				
+				uint fps = driver->getFPS();
+				if(lFps != fps){
+					irr::core::stringw c(L"irrwyg in irrlicht - [");
+					c += driver->getName() ;
+					c += L"] FPS: ";
+					c += fps;
+					device->setWindowCaption(c.c_str());
+				}
+				// if(terminal.isShown()) {
+				// 	terminal.draw(device);
+				// 	device->getGUIEnvironment()->drawAll();
+				// }
+				else{
+					// for(const Quadrant& q : pixels)
+					// 	driver->drawPixel(q.x, q.y, irr::video::SColor(255, q.r, q.g, q.b));
+				}
+				driver->endScene();
+			}else{
+				device->yield();
+			}
+		}
+
 };
 
-class Window : public ADisplayable, public AContainer{
+class Window : public ADrawable, public AContainer{
 	private:
 		bool m;
 	public:
@@ -281,34 +304,34 @@ class Window : public ADisplayable, public AContainer{
 		const bool& modal() const {return m;}
 };
 
-class Tab : public ADisplayable{
+class Tab : public ADrawable{
 	public:
-		void display() throw(DisplayException){}
+		void draw() throw(DrawException){}
 };
 
-class Toolbar : public ADisplayable{
+class Toolbar : public ADrawable{
 	public:
-		void display() throw(DisplayException){}
+		void draw(irr::IrrlichtDevice *device) throw(DrawException){}
 };
-class ToolbarItem : public ADisplayable{
+class ToolbarItem : public ADrawable{
 	public:
-		void display() throw(DisplayException){}
+		void draw(irr::IrrlichtDevice *device) throw(DrawException){}
 };
-class Menu : public ADisplayable{
+class Menu : public ADrawable{
 	public:
-		void display() throw(DisplayException){}
+		void draw(irr::IrrlichtDevice *device) throw(DrawException){}
 };
-class MenuItem : public ADisplayable{
+class MenuItem : public ADrawable{
 	public:
-		void display() throw(DisplayException){}
+		void draw(irr::IrrlichtDevice *device) throw(DrawException){}
 };
 
 class Tree{};
 class FileTree : public Tree{};
 
-class Button : public ADisplayable{
+class Button : public ADrawable{
 	public:
-		void display() throw(DisplayException){}
+		void draw(irr::IrrlichtDevice *device) throw(DrawException){}
 };
 class TextButton : public Button{};
 class ImgButton : public Button{};

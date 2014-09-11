@@ -27,7 +27,7 @@ irrlight::SceneGraph* irrlight::SceneGraph::instance(0);
 
 irrlight::SceneGraph::~SceneGraph(){}
 
-irrlight::SceneGraph* irrlight::SceneGraph::getInstance(){
+irrlight::SceneGraph* irrlight::SceneGraph::INSTANCE(){
     if(instance == 0){
         instance = new SceneGraph();
     }
@@ -35,28 +35,28 @@ irrlight::SceneGraph* irrlight::SceneGraph::getInstance(){
 }
 
 void irrlight::SceneGraph::draw(/*IDrawableContext idc*/) const{
-    if(scene.get()){
-        scene->draw(this->getDevice());
+    if(s.get()){
+        s->draw();
     }
 }
 
-void irrlight::SceneGraph::setDevice(irr::IrrlichtDevice* device){
-	this->device.reset(device);
+void irrlight::SceneGraph::device(irr::IrrlichtDevice* device){
+	this->d.reset(device);
 }
 
-void irrlight::SceneGraph::setScene(AScene * aScene){
-    if(this->scene.get()){
-        this->scene->tearDown(this->getDevice());
+void irrlight::SceneGraph::scene(AScene * aScene){
+    if(this->s.get()){
+        this->s->tearDown();
     }
-    this->scene.reset(aScene);
-    aScene->setUp(this->getDevice());
+    this->s.reset(aScene);
+    aScene->setUp();
 }
 
 bool irrlight::SceneGraph::OnEvent(const irr::SEvent& event){
-    if(scene.get()){
-        if		(event.EventType == irr::EET_KEY_INPUT_EVENT && event.KeyInput.PressedDown)     scene->keyDown	(getDevice(), event.KeyInput.Key);
-        else if	(event.EventType == irr::EET_KEY_INPUT_EVENT && !event.KeyInput.PressedDown)    scene->keyUp	(getDevice(), event.KeyInput.Key);
-        return scene->OnEvent(getDevice(), event);
+    if(s.get()){
+        if		(event.EventType == irr::EET_KEY_INPUT_EVENT &&  event.KeyInput.PressedDown)    s->keyDown	(event.KeyInput.Key);
+        else if	(event.EventType == irr::EET_KEY_INPUT_EVENT && !event.KeyInput.PressedDown)	s->keyUp	(event.KeyInput.Key);
+        return s->OnEvent(event);
     }
     return false;
 }
