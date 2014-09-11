@@ -6,5 +6,5 @@ this:
 		$(MAKE) -C $(CURDIR)/trunk/source/Irrlicht; \
 	fi;
 
-mint17:
+debian:
 	sudo apt-get install libglu1-mesa-dev libgl1-mesa-dev libX11-dev libx11-xcb-dev libxcb-glx0-dev libxcb1-dev libxxf86vm-dev libXext-dev libxdmcp-dev libxau-dev libxdamage-dev libxfixes-dev libdrm-dev 

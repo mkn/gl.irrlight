@@ -84,7 +84,7 @@ class ATerminalCmd{
 class TerminalHistory{
 	private:
 		static int MINUS_ONE;
-		unsigned int it;
+		int it;
 		std::vector<std::wstring> history;		
 	public:
 		TerminalHistory() : it(-1){}
