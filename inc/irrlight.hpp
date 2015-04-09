@@ -46,7 +46,7 @@ class AScene{
 		irr::IrrlichtDevice* device(){ return d.get(); }
 	public:
 		AScene(irr::IrrlichtDevice* d) : d(d){}
-		virtual ~AScene(){};
+		virtual ~AScene(){}
 		virtual void setUp 		(){}
 		virtual void tearDown	(){}
 		virtual void draw		(){}
@@ -63,14 +63,16 @@ class SceneGraph : public irr::IEventReceiver{
 		SceneGraph() : s(0), d(irr::createDevice(irr::video::EDT_NULL, irr::core::dimension2d<irr::u32>(512, 384))){}
 		static SceneGraph *instance;
 	public:
-		~SceneGraph();
 		irr::IrrlichtDevice* 	device 	()	const { return this->d.get();}
 		void 					device 	(irr::IrrlichtDevice* d);
 		AScene* 				scene 	()	const { return this->s.get();}
 		void 					scene 	(AScene* aScene);
-		void 					draw 	(/*IDrawableContext idc*/)  const;
+		void 					draw 	() const { if(s.get()) s->draw();}
 		bool 					OnEvent	(const irr::SEvent& event);
-		static SceneGraph* 		INSTANCE();
+		static SceneGraph& 		INSTANCE(){
+			static SceneGraph instance;
+			return instance;
+		}
 };
 
 class ATerminalCmd{
@@ -181,18 +183,15 @@ class SceneThreadException : public kul::Exception{
 		SceneThreadException(const char*f, const int l, std::string s) : kul::Exception(f, l, s){}
 };
 
-class SceneThread  {
+class SceneThread{
 	public:
 		SceneThread(AScene& aScene) throw(SceneThreadException) : aScene(aScene)
 			, device(irr::createDevice(irr::video::EDT_NULL, irr::core::dimension2d<irr::u32>(512, 384))), ref(*this), thread(ref){
 			this->check();
 			thread.run();
 		}
-		~SceneThread() {
-			thread.interrupt();
-		}
-		irr::IrrlichtDevice * getDevice(){ return this->device.get();}
-		AScene   * getScene()		{ return &this->aScene;}
+		irr::IrrlichtDevice* getDevice(){ return this->device.get();}
+		AScene* getScene()				{ return &this->aScene;}
 		bool isFinished(){
 			return thread.finished();
 		}
@@ -212,7 +211,7 @@ class SceneThread  {
 
 		void check() throw(SceneThreadException){
 			if (!&aScene || !&device){
-				throw SceneThreadException(__FILE__, __LINE__, "Scene or device cannot be null");
+				KEXCEPT(SceneThreadException, "Scene or device cannot be null");
 			}
 		}
 

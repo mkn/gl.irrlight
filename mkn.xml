@@ -28,75 +28,25 @@ along with this library.  If not, see <http://www.gnu.org/licenses/>.
 		<version>master</version>
 	</project>
 
-	<profiles>
-		<profile name="nix">
-			<dependencies>
-				<dependency>
-					<name>kul.nix</name>
-					<profile>nixr</profile>
-					<version>master</version>
-					<remote scm="git">http://www.github.com/Dekken/kul.nix.git</remote>
-				</dependency>
-				<dependency>
-					<name>irrlicht</name>
-					<profile>nixr</profile>
-					<version>trunk</version>
-					<make>this</make>
-					<local>./ext/irrlicht</local>
-				</dependency>
-			</dependencies>
-			<includes>
-				<include>./inc</include>
-			</includes>
-			<build type="lib" mode="static" lang="cpp">
-				<files>
-					<file type="cpp">
-						<args>
-							<arg>-std=c++11</arg>
-							<arg>-Wall</arg><arg>-fmessage-length=0</arg>
-							<arg>-O0</arg><arg>-g3</arg>
-						</args>
-					</file>
-				</files>
-			</build>
-		</profile>
-		<profile name="nixr" parent="nix">
-			<build type="lib" mode="static" lang="cpp"> 
-				<files>
-					<file type="cpp">
-						<args><arg>-O3</arg><arg>-g0</arg></args>
-					</file>
-				</files>
-			</build>
-		</profile>
-
-		<profile name="win">
-			<dependencies>
-				<dependency>
-					<name>kul.win</name>
-					<profile>winr</profile>
-					<version>master</version>
-					<remote scm="git">http://www.github.com/Dekken/kul.win.git</remote>
-				</dependency>
-				<dependency>
-					<name>irrlicht</name>
-					<profile>winr</profile>
-					<version>trunk</version>
-					<make>this</make>
-					<local>./ext/irrlicht</local>
-				</dependency>
-			</dependencies>
-			<includes>
-				<include>./inc</include>
-			</includes>
-			<build type="lib" mode="static" lang="cpp">
-				<files>
-					<file type="cpp">
-						<args><arg>/EHsc</arg></args>
-					</file>
-				</files>
-			</build>
-		</profile>
-	</profiles>
+	<dependencies>
+		<dependency>
+			<name>kul</name>
+			<version>master</version>
+			<scr scm="git">http://www.github.com/Dekken/kul.git</scr>
+		</dependency>
+		<dependency>
+			<name>irrlicht</name>
+			<version>trunk</version>
+			<make>this</make>
+			<local>./ext/irrlicht</local>
+		</dependency>
+	</dependencies>
+	<includes>
+		<include>./inc</include>
+	</includes>
+	<sources>
+		<source>./src</source>
+	</sources>
+	<build type="lib" mode="static" lang="cpp"/>
 </maiken>
 

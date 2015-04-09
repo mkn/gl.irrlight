@@ -11,8 +11,11 @@
 			<includes>
 				<include>./trunk/include</include>
 			</includes>
+			<sources>
+				<source recurse="false">./trunk/source/Irrlicht</source>
+			</sources>
 		</profile>
-		<profile name="nixr" parent="c">
+		<profile name="nix" parent="c" os="nix">
 			<library-paths>
 				<library-path>./trunk/lib/Linux</library-path>
 			</library-paths>
@@ -34,15 +37,28 @@
 				<library>drm</library>
 				<library>rt</library>
 			</libraries>
-			<!-- used when no profile is specified. supplied default values to profiles if required -->		
 			<build type="lib" mode="static" lang="cpp"/>
 		</profile>
 
-		<profile name="win" parent="c">
-			<library-paths>
-				<library-path>./trunk/lib/Win</library-path>
-			</library-paths>
-			<build type="lib" mode="static" lang="cpp"/>
+		<profile name="win" parent="c" os="win">
+			<build type="lib" mode="static" lang="cpp">
+				<files>
+					<file type="cpp">
+						<args>
+							<arg>/EHsc</arg>
+							<arg>-DIRRLICHT_EXPORTS=1</arg>
+							<arg>-DPNG_NO_MMX_CODE</arg>
+							<arg>-DPNG_NO_MNG_FEATURES</arg>
+							<arg>-D__GNUWIN32__</arg>
+							<arg>-D_WIN32</arg>
+							<arg>-D_WINDOWS</arg>
+							<arg>-D_MBCS</arg>
+							<arg>-D_USRDLL</arg>
+							<arg>-DNO_IRR_COMPILE_WITH_DIRECT3D_9_</arg>
+						</args>
+					</file>
+				</files>
+			</build>
 		</profile>
 	</profiles>
 </maiken>

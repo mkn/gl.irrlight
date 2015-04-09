@@ -25,7 +25,7 @@ along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
 int irrlight::TerminalHistory::MINUS_ONE = -(1);
 
-void irrlight::Terminal::draw	 (){
+void irrlight::Terminal::draw(){
 	irr::core::rect<int> rect(0, 0, 400, 300);
 	irr::video::IVideoDriver * driver	= d->getVideoDriver();
 	driver->draw2DRectangle(irr::video::SColor(200,0,0,0), rect);
