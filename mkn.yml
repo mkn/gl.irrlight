@@ -1,0 +1,13 @@
+
+
+name: irrlight
+
+inc: inc
+src: src
+dep: mkn.kul gl.irrlicht
+
+profile:
+- name: format
+  mod: |
+    clang.format{init{style: file, types: hpp cpp ipp, paths: .}}
+
